@@ -4,6 +4,7 @@
 from collections import namedtuple
 Item = namedtuple("Item", ['index', 'value', 'weight'])
 from knapsack import KnapSack
+from knapsack_branchnbound import KnapSackBranchNBound
 
 def solve_it(input_data):
     # Modify this code to run your optimization algorithm
@@ -20,7 +21,7 @@ def solve_it(input_data):
     for i in range(1, item_count+1):
         line = lines[i]
         parts = line.split()
-        items.append(Item(i-1, int(parts[0]), int(parts[1])))
+        items.append(Item(i-1, int(parts[0]), float(parts[1])))
 
     # a trivial greedy algorithm for filling the knapsack
     # it takes items in-order until the knapsack is full
@@ -33,10 +34,16 @@ def solve_it(input_data):
     #         taken[item.index] = 1
     #         value += item.value
     #         weight += item.weight
-    ksack = KnapSack(item_count, capacity, items)
-    ksack.generate_table()
-    ksack.generate_solution()
-    return ksack.get_solution()
+
+
+    # ksack = KnapSack(item_count, capacity, items)
+    # ksack.generate_table()
+    # ksack.generate_solution()
+    # return ksack.get_solution()
+
+    kbb = KnapSackBranchNBound(capacity, items, item_count)
+
+    return kbb
 
 
 
