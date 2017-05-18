@@ -4,7 +4,7 @@
 from collections import namedtuple
 Item = namedtuple("Item", ['index', 'value', 'weight'])
 from knapsack import KnapSack
-from knapsack_branchnbound import KnapSackBranchNBound
+from knapsack_branchnbound import KnapSackBranchNBound, get_solution
 
 def solve_it(input_data):
     # Modify this code to run your optimization algorithm
@@ -41,9 +41,10 @@ def solve_it(input_data):
     # ksack.generate_solution()
     # return ksack.get_solution()
 
-    kbb = KnapSackBranchNBound(capacity, items, item_count)
+    kbb, taken = KnapSackBranchNBound(capacity, items, item_count)
+    output = get_solution(kbb, taken)
 
-    return kbb
+    return output
 
 
 

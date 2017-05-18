@@ -1,6 +1,8 @@
-#http://www.geeksforgeeks.org/branch-and-bound-set-2-implementation-of-01-knapsack/
+# http://www.geeksforgeeks.org/branch-and-bound-set-2-implementation-of-01-knapsack/
+# https://github.com/tegarwicaksono/knapsack/blob/master/solver_alt.py
 
 from queue import Queue
+from collections import deque
 class Node:
     def __init__(self):
         self.level = None
@@ -31,7 +33,7 @@ def bound(node, n, W, items):
 
     return profit_bound
 
-Q = Queue()
+Q = deque([])
 
 def KnapSackBranchNBound(weight, items, total_items):
     items = sorted(items, key=lambda x: x.value/float(x.weight), reverse=True)
@@ -42,12 +44,16 @@ def KnapSackBranchNBound(weight, items, total_items):
     u.profit = 0
     u.weight = 0
 
-    Q.put(u)
-    maxProfit = 0;
+    Q.append(u)
+    maxProfit = 0
+    bestItems = []
 
-    while not Q.empty():
-        u = Q.get()
+    while (len(Q) != 0):
+
+        u = Q[0]
+        Q.popleft()
         v = Node()
+
         if u.level == -1:
             v.level = 0
 
@@ -57,30 +63,45 @@ def KnapSackBranchNBound(weight, items, total_items):
         v.level = u.level + 1
         v.weight = u.weight + items[v.level].weight
         v.profit = u.profit + items[v.level].value
+        v.contains = list(u.contains)
+        v.contains.append(items[v.level].index)
+
         if (v.weight <= weight and v.profit > maxProfit):
-            maxProfit = v.profit;
+            maxProfit = v.profit
+            bestItems = v.contains
 
         v.bound = bound(v, total_items, weight, items)
         if (v.bound > maxProfit):
             # print v
-            Q.put(v)
+            Q.append(v)
 
         v = Node()
         v.level = u.level + 1
- 
         v.weight = u.weight
         v.profit = u.profit
+        v.contains = list(u.contains)
+
         v.bound = bound(v, total_items, weight, items)
         if (v.bound > maxProfit):
             # print v
-            Q.put(v)
+            Q.append(v)
 
-    return maxProfit
+    taken = [0] * len(items)
+    for i in xrange(len(bestItems)):
+        taken[bestItems[i]] = 1
+
+    return maxProfit, taken
+
+def get_solution(optimal_value, taken):
+    output_data = None
+    output_data = str(optimal_value) + ' ' + str(1) + '\n'
+    output_data += ' '.join(map(str, taken))
+    return output_data
 
 if __name__ == "__main__":
     from collections import namedtuple
     Item = namedtuple("Item", ['index', 'value', 'weight'])
-    input_data = open("./data/ks_10000_0").read()
+    input_data = open("./data/test").read()
     lines = input_data.split('\n')
 
     firstLine = lines[0].split()
